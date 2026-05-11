@@ -9,6 +9,7 @@ import Footer from './Footer';
 function App() {
   const [recherche, setRecherche] = useState("");
   const [ligneSelectionnee, setLigneSelectionnee] = useState(null);
+  const [nbRecherches, setNbRecherches] = useState(0);
 
   const lignes = [
     { id: 1, numero: "1", depart: "Parcelles Assainies",
@@ -57,8 +58,19 @@ function App() {
     <div className="App">
       <Header />
       <main className="contenu">
-        <Recherche valeur={recherche} onChange={setRecherche} />
+        <Recherche 
+  valeur={recherche} 
+  onChange={(valeur) => {
+    setRecherche(valeur);
+    setNbRecherches(n => n + 1);
+  }} 
+/><p className="compteur-recherche">
+  Vous avez effectué {nbRecherches} recherche{nbRecherches > 1 ? 's' : ''}
+</p>
         <p className="resultat-recherche">
+          {lignesFiltrees.length === 0 && (
+  <p className="aucun-resultat">Aucune ligne trouvée.</p>
+)}
           {lignesFiltrees.length} ligne{lignesFiltrees.length > 1 ? 's' : ''} trouvee{lignesFiltrees.length > 1 ? 's' : ''}
         </p>
         {lignesFiltrees.map(ligne => (
