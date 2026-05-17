@@ -7,16 +7,17 @@ import DetailLigne from './DetailLigne';
 import Footer from './Footer';
 
 function App() {
-  // 1. Trois etats
   const [lignes, setLignes] = useState([]);
   const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState(null);
   const [recherche, setRecherche] = useState("");
   const [ligneSelectionnee, setLigneSelectionnee] = useState(null);
   const [nbRecherches, setNbRecherches] = useState(0);
+  const [chargementDetail, setChargementDetail] = useState(false);
 
-  // 2. Charger les donnees depuis Flask au demarrage
-  useEffect(() => {
+  function chargerLignes() {
+    setChargement(true);
+    setErreur(null);
     fetch("http://localhost:5000/lignes")
       .then(response => {
         if (!response.ok) {
@@ -32,24 +33,42 @@ function App() {
         setErreur(error.message);
         setChargement(false);
       });
-  }, []); // <-- [] OBLIGATOIRE sinon boucle infinie
+  }
 
-  // 3. Filtre de recherche
+  useEffect(() => {
+    chargerLignes();
+  }, []);
+
   const lignesFiltrees = lignes.filter(l =>
     l.depart.toLowerCase().includes(recherche.toLowerCase()) ||
     l.arrivee.toLowerCase().includes(recherche.toLowerCase()) ||
     l.numero.includes(recherche)
   );
 
+  // Exercice 3 : fetch des details au clic
   function handleClickLigne(ligne) {
     if (ligneSelectionnee && ligneSelectionnee.id === ligne.id) {
       setLigneSelectionnee(null);
-    } else {
-      setLigneSelectionnee(ligne);
+      return;
     }
+    setChargementDetail(true);
+    fetch(`http://localhost:5000/lignes/${ligne.id}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Erreur chargement detail : " + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        setLigneSelectionnee(data);
+        setChargementDetail(false);
+      })
+      .catch(error => {
+        console.error(error.message);
+        setChargementDetail(false);
+      });
   }
 
-  // Ecran de chargement
   if (chargement) {
     return (
       <div className="App">
@@ -61,12 +80,14 @@ function App() {
     );
   }
 
-  // Ecran d'erreur
   if (erreur) {
     return (
       <div className="App">
         <Header />
         <main className="contenu">
+          <button className="btn-recharger" onClick={chargerLignes}>
+            🔄 Recharger
+          </button>
           <div className="message-erreur">
             <p>Impossible de charger les lignes.</p>
             <p className="erreur-detail">{erreur}</p>
@@ -77,11 +98,13 @@ function App() {
     );
   }
 
-  // Ecran normal
   return (
     <div className="App">
       <Header />
       <main className="contenu">
+        <button className="btn-recharger" onClick={chargerLignes}>
+          🔄 Recharger
+        </button>
         <Recherche
           valeur={recherche}
           onChange={(valeur) => {
@@ -109,7 +132,12 @@ function App() {
             onClick={() => handleClickLigne(ligne)}
           />
         ))}
-        {ligneSelectionnee && <DetailLigne ligne={ligneSelectionnee} />}
+        {chargementDetail && (
+          <p className="message-chargement">Chargement des détails...</p>
+        )}
+        {ligneSelectionnee && !chargementDetail && (
+          <DetailLigne ligne={ligneSelectionnee} />
+        )}
       </main>
       <Footer />
     </div>
