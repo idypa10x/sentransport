@@ -5,6 +5,7 @@ import Recherche from './Recherche';
 import LigneBus from './LigneBus';
 import DetailLigne from './DetailLigne';
 import Footer from './Footer';
+import Carte from './Carte';
 
 function App() {
   const [lignes, setLignes] = useState([]);
@@ -138,6 +139,8 @@ function App() {
         {ligneSelectionnee && !chargementDetail && (
           <DetailLigne ligne={ligneSelectionnee} />
         )}
+        {ligneSelectionnee && <DetailLigne ligne={ligneSelectionnee} />}
+<Carte /> {/* NOUVEAU */}
       </main>
       <Footer />
     </div>
