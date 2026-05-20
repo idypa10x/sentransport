@@ -6,6 +6,8 @@ import LigneBus from './LigneBus';
 import DetailLigne from './DetailLigne';
 import Footer from './Footer';
 import Carte from './Carte';
+import Meteo from './Meteo';
+import SignalerIncident from './SignalerIncident';
 
 function App() {
   const [lignes, setLignes] = useState([]);
@@ -86,6 +88,7 @@ function App() {
       <div className="App">
         <Header />
         <main className="contenu">
+            <Meteo />
           <button className="btn-recharger" onClick={chargerLignes}>
             🔄 Recharger
           </button>
@@ -103,6 +106,8 @@ function App() {
     <div className="App">
       <Header />
       <main className="contenu">
+        <Meteo />
+        
         <button className="btn-recharger" onClick={chargerLignes}>
           🔄 Recharger
         </button>
@@ -133,14 +138,14 @@ function App() {
             onClick={() => handleClickLigne(ligne)}
           />
         ))}
-        {chargementDetail && (
+       {chargementDetail && (
           <p className="message-chargement">Chargement des détails...</p>
         )}
         {ligneSelectionnee && !chargementDetail && (
           <DetailLigne ligne={ligneSelectionnee} />
         )}
-        {ligneSelectionnee && <DetailLigne ligne={ligneSelectionnee} />}
-<Carte /> {/* NOUVEAU */}
+        <Carte />
+        <SignalerIncident />
       </main>
       <Footer />
     </div>

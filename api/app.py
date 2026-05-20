@@ -24,7 +24,6 @@ def accueil():
 def get_lignes():
     return jsonify(lignes)
 
-
 @app.route("/lignes/<int:ligne_id>")
 def get_ligne(ligne_id):
     ligne = next(
@@ -35,11 +34,9 @@ def get_ligne(ligne_id):
         return jsonify({"erreur": "Ligne non trouvee"}), 404
     return jsonify(ligne)
 
-
 @app.route("/arrets")
 def get_arrets():
     return jsonify(arrets)
-
 
 @app.route("/stats")
 def get_stats():
@@ -60,6 +57,26 @@ def recherche_lignes():
         if q in l["depart"].lower() or q in l["arrivee"].lower()
     ]
     return jsonify(resultats)
+
+incidents = []
+
+@app.route("/incidents", methods=["GET"])
+def get_incidents():
+    return jsonify(incidents)
+
+@app.route("/incidents", methods=["POST"])
+def post_incident():
+    data = request.get_json()
+    if not data or "ligne" not in data or "description" not in data:
+        return jsonify({"erreur": "Champs requis manquants"}), 400
+    incident = {
+        "id": len(incidents) + 1,
+        "ligne": data["ligne"],
+        "description": data["description"],
+        "lieu": data.get("lieu", "Non precise"),
+    }
+    incidents.append(incident)
+    return jsonify(incident), 201
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
